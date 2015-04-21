@@ -121,7 +121,9 @@ public class LocalGregorianCalendar extends BaseCalendar {
         Properties calendarProps;
         try {
             calendarProps = CalendarSystem.getCalendarProperties();
-        } catch (IOException | IllegalArgumentException e) {
+        } catch (IOException e) {
+            throw new InternalError(null != e.getMessage() ? e.getMessage(): "");
+        } catch (IllegalArgumentException e) {
             throw new InternalError(null != e.getMessage() ? e.getMessage(): "");
         }
         // Parse calendar.*.eras
@@ -129,7 +131,7 @@ public class LocalGregorianCalendar extends BaseCalendar {
         if (props == null) {
             return null;
         }
-        List<Era> eras = new ArrayList<>();
+        List<Era> eras = new ArrayList<Era>();
         StringTokenizer eraTokens = new StringTokenizer(props, ";");
         while (eraTokens.hasMoreTokens()) {
             String items = eraTokens.nextToken().trim();

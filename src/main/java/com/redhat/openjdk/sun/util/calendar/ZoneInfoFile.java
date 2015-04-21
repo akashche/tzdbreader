@@ -52,6 +52,7 @@ import java.util.SimpleTimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.CRC32;
 
+import com.redhat.openjdk.support7.AutoCloseableUtils;
 import com.redhat.openjdk.support7.MathUtils;
 import sun.security.action.GetPropertyAction;
 
@@ -94,7 +95,7 @@ public final class ZoneInfoFile {
      * @return an array of time zone IDs.
      */
     public static String[] getZoneIds(int rawOffset) {
-        List<String> ids = new ArrayList<>();
+        List<String> ids = new ArrayList<String>();
         for (String id : getZoneIds()) {
             ZoneInfo zi = getZoneInfo(id);
             if (zi.getRawOffset() == rawOffset) {
@@ -208,8 +209,8 @@ public final class ZoneInfoFile {
     }
 
     private static String versionId;
-    private final static Map<String, ZoneInfo> zones = new ConcurrentHashMap<>();
-    private static Map<String, String> aliases = new HashMap<>();
+    private final static Map<String, ZoneInfo> zones = new ConcurrentHashMap<String, ZoneInfo>();
+    private static Map<String, String> aliases = new HashMap<String, String>();
 
     private static byte[][] ruleArray;
     private static String[] regions;
@@ -254,10 +255,13 @@ public final class ZoneInfoFile {
             public Object run() {
                 try {
                     String libDir = System.getProperty("java.home") + File.separator + "lib";
-                    try (DataInputStream dis = new DataInputStream(
-                             new BufferedInputStream(new FileInputStream(
-                                 new File(libDir, "tzdb.dat"))))) {
+                    FileInputStream fis = null;
+                    try {
+                        fis = new FileInputStream(new File(libDir, "tzdb.dat"));
+                        DataInputStream dis = new DataInputStream(new BufferedInputStream(fis));
                         load(dis);
+                    } finally {
+                        AutoCloseableUtils.closeQuietly(fis);
                     }
                 } catch (Exception x) {
                     throw new Error(x);

@@ -33,6 +33,8 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Properties;
 import com.redhat.openjdk.java.util.TimeZone;
+import com.redhat.openjdk.support7.AutoCloseableUtils;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -99,7 +101,7 @@ public abstract class CalendarSystem {
     };
 
     private static void initNames() {
-        ConcurrentMap<String,String> nameMap = new ConcurrentHashMap<>();
+        ConcurrentMap<String,String> nameMap = new ConcurrentHashMap<String,String>();
 
         // Associate a calendar name with its class name and the
         // calendar class name with its date class name.
@@ -112,7 +114,7 @@ public abstract class CalendarSystem {
         synchronized (CalendarSystem.class) {
             if (!initialized) {
                 names = nameMap;
-                calendars = new ConcurrentHashMap<>();
+                calendars = new ConcurrentHashMap<String,CalendarSystem>();
                 initialized = true;
             }
         }
@@ -196,8 +198,12 @@ public abstract class CalendarSystem {
                 @Override
                 public Properties run() throws IOException {
                     Properties props = new Properties();
-                    try (FileInputStream fis = new FileInputStream(fname)) {
+                    FileInputStream fis = null;
+                    try {
+                        fis = new FileInputStream(fname);
                         props.load(fis);
+                    } finally {
+                        AutoCloseableUtils.closeQuietly(fis);
                     }
                     return props;
                 }
