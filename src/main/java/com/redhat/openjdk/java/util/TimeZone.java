@@ -41,7 +41,6 @@ package com.redhat.openjdk.java.util;
 import java.io.Serializable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
 import java.util.PropertyPermission;
@@ -520,46 +519,6 @@ abstract public class TimeZone implements Serializable, Cloneable {
         return getTimeZone(ID, true);
     }
 
-    /**
-     * Gets the {@code TimeZone} for the given {@code zoneId}.
-     *
-     * @param zoneId a {@link ZoneId} from which the time zone ID is obtained
-     * @return the specified {@code TimeZone}, or the GMT zone if the given ID
-     *         cannot be understood.
-     * @throws NullPointerException if {@code zoneId} is {@code null}
-     * @since 1.8
-     */
-    public static TimeZone getTimeZone(ZoneId zoneId) {
-        String tzid = zoneId.getId(); // throws an NPE if null
-        char c = tzid.charAt(0);
-        if (c == '+' || c == '-') {
-            tzid = "GMT" + tzid;
-        } else if (c == 'Z' && tzid.length() == 1) {
-            tzid = "UTC";
-        }
-        return getTimeZone(tzid, true);
-    }
-
-    /**
-     * Converts this {@code TimeZone} object to a {@code ZoneId}.
-     *
-     * @return a {@code ZoneId} representing the same time zone as this
-     *         {@code TimeZone}
-     * @since 1.8
-     */
-    public ZoneId toZoneId() {
-        String id = getID();
-        if (ZoneInfoFile.useOldMapping() && id.length() == 3) {
-            if ("EST".equals(id))
-                return ZoneId.of("America/New_York");
-            if ("MST".equals(id))
-                return ZoneId.of("America/Denver");
-            if ("HST".equals(id))
-                return ZoneId.of("America/Honolulu");
-        }
-        return ZoneId.of(id, ZoneId.SHORT_IDS);
-    }
-
     private static TimeZone getTimeZone(String ID, boolean fallback) {
         TimeZone tz = ZoneInfo.getTimeZone(ID);
         if (tz == null) {
@@ -743,7 +702,7 @@ abstract public class TimeZone implements Serializable, Cloneable {
             other.ID = ID;
             return other;
         } catch (CloneNotSupportedException e) {
-            throw new InternalError(e);
+            throw new InternalError(null != e.getMessage() ? e.getMessage(): "");
         }
     }
 

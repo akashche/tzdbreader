@@ -167,7 +167,7 @@ public abstract class CalendarSystem {
                 Class<?> cl = Class.forName(className);
                 cal = (CalendarSystem) cl.newInstance();
             } catch (Exception e) {
-                throw new InternalError(e);
+                throw new InternalError(null != e.getMessage() ? e.getMessage(): "");
             }
         }
         if (cal == null) {
@@ -210,7 +210,7 @@ public abstract class CalendarSystem {
                 throw (IllegalArgumentException) cause;
             }
             // Should not happen
-            throw new InternalError(cause);
+            throw new InternalError(null != cause.getMessage() ? cause.getMessage(): "");
         }
         return calendarProps;
     }

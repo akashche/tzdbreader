@@ -35,8 +35,8 @@ import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import com.redhat.openjdk.java.time.LocalDateTime;
+import com.redhat.openjdk.java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -51,6 +51,8 @@ import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.CRC32;
+
+import com.redhat.openjdk.support7.MathUtils;
 import sun.security.action.GetPropertyAction;
 
 /**
@@ -774,7 +776,7 @@ public final class ZoneInfoFile {
 
     private static int getYear(long epochSecond, int offset) {
         long second = epochSecond + offset;  // overflow caught later
-        long epochDay = Math.floorDiv(second, SECONDS_PER_DAY);
+        long epochDay = MathUtils.floorDiv(second, SECONDS_PER_DAY);
         long zeroDay = epochDay + DAYS_0000_TO_1970;
         // find the march-based year
         zeroDay -= 60;  // adjust to 0000-03-01 so leap day is at end of four year cycle
@@ -990,7 +992,7 @@ public final class ZoneInfoFile {
         }
 
         static final long adjust(long epochDay, int dow, int relative) {
-            int calDow = (int)Math.floorMod(epochDay + 3, 7L) + 1;
+            int calDow = (int)MathUtils.floorMod(epochDay + 3, 7L) + 1;
             if (relative < 2 && calDow == dow) {
                 return epochDay;
             }
