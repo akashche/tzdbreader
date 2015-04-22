@@ -34,38 +34,27 @@
  * to do so, delete this exception statement from your version.
  */
 
-import tzdb.java.util.TimeZone;
-import tzdb.sun.util.calendar.ZoneInfoFile;
-import org.junit.Test;
-
-import java.io.File;
-import java.net.URI;
+package tzdb.support7;
 
 /**
- * tzdb.dat load test
+ * Partial copy of Integer from jdk7u
  */
-public class ZoneInfoFileTest {
+public class IntegerUtils {
 
-    @Test
-    public void test() throws ClassNotFoundException {
-        File projectDir = codeSourceDir(ZoneInfoFileTest.class).getParentFile().getParentFile();
-//        System.out.println(new File(projectDir, "src/test/resources").getAbsolutePath());
-        System.setProperty("tzdb.java.home", new File(projectDir, "src/test/resources").getAbsolutePath());
-        ZoneInfoFile.fireLoad();
-        System.out.println(ZoneInfoFile.getVersion());
-        System.out.println(TimeZone.getTimeZone("Europe/Dublin"));
-        System.out.println(TimeZone.getTimeZone("America/Toronto"));
-        System.out.println(TimeZone.getTimeZone("Asia/Tehran"));
-//        System.out.println(Arrays.toString(TimeZone.getAvailableIDs()));
-    }
-
-    private static File codeSourceDir(Class<?> clazz) {
-        try {
-            URI uri = clazz.getProtectionDomain().getCodeSource().getLocation().toURI();
-            File jarOrDir = new File(uri);
-            return jarOrDir.isDirectory() ? jarOrDir : jarOrDir.getParentFile();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    /**
+     * Compares two {@code int} values numerically.
+     * The value returned is identical to what would be returned by:
+     * <pre>
+     *    Integer.valueOf(x).compareTo(Integer.valueOf(y))
+     * </pre>
+     *
+     * @param  x the first {@code int} to compare
+     * @param  y the second {@code int} to compare
+     * @return the value {@code 0} if {@code x == y};
+     *         a value less than {@code 0} if {@code x < y}; and
+     *         a value greater than {@code 0} if {@code x > y}
+     */
+    public static int compare(int x, int y) {
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 }
