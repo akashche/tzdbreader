@@ -217,7 +217,8 @@ public final class ZoneInfoFile {
     private static int[] indices;
 
     // Flag for supporting JDK backward compatible IDs, such as "EST".
-    private static final boolean USE_OLDMAPPING;
+    // todo: make me final
+    private static boolean USE_OLDMAPPING;
 
     private static String[][] oldMappings = new String[][] {
         { "ACT", "Australia/Darwin" },
@@ -247,7 +248,7 @@ public final class ZoneInfoFile {
         { "VST", "Asia/Ho_Chi_Minh" },
     };
 
-    static {
+    public static void fireLoad() {
         String oldmapping = AccessController.doPrivileged(
             new GetPropertyAction("sun.timezone.ids.oldmapping", "false")).toLowerCase(Locale.ROOT);
         USE_OLDMAPPING = (oldmapping.equals("yes") || oldmapping.equals("true"));
@@ -297,7 +298,6 @@ public final class ZoneInfoFile {
      * @param dis  the DateInputStream to load, not null
      * @throws Exception if an error occurs
      */
-    // todo: drop printlns
     private static void load(DataInputStream dis) throws ClassNotFoundException, IOException {
         if (dis.readByte() != 1) {
             throw new StreamCorruptedException("File format not recognised");
@@ -307,12 +307,10 @@ public final class ZoneInfoFile {
         if ("TZDB".equals(groupId) == false) {
             throw new StreamCorruptedException("File format not recognised");
         }
-        System.out.println("groupId: [" + groupId + "]");
         // versions, only keep the last one
         int versionCount = dis.readShort();
         for (int i = 0; i < versionCount; i++) {
             versionId = dis.readUTF();
-            System.out.println("versionId: [" + versionId + "]");
         }
         // regions
         int regionCount = dis.readShort();
@@ -320,7 +318,6 @@ public final class ZoneInfoFile {
         for (int i = 0; i < regionCount; i++) {
             regionArray[i] = dis.readUTF();
         }
-        System.out.println("regionArray: [" + Arrays.toString(regionArray) + "]");
         // rules
         int ruleCount = dis.readShort();
         ruleArray = new byte[ruleCount][];
@@ -329,19 +326,15 @@ public final class ZoneInfoFile {
             dis.readFully(bytes);
             ruleArray[i] = bytes;
         }
-        System.out.println("ruleArray: [" + Arrays.toString(ruleArray) + "]");
         // link version-region-rules, only keep the last version, if more than one
         for (int i = 0; i < versionCount; i++) {
             regionCount = dis.readShort();
-            System.out.println("regionCount: [" + regionCount + "]");
             regions = new String[regionCount];
             indices = new int[regionCount];
             for (int j = 0; j < regionCount; j++) {
                 regions[j] = regionArray[dis.readShort()];
                 indices[j] = dis.readShort();
             }
-            System.out.println("regions: [" + Arrays.toString(regions) + "]");
-            System.out.println("indices: [" + Arrays.toString(indices) + "]");
         }
         // remove the following ids from the map, they
         // are exclued from the "old" ZoneInfo
@@ -354,7 +347,6 @@ public final class ZoneInfoFile {
                 String region = regionArray[dis.readShort()];
                 aliases.put(alias, region);
             }
-            System.out.println("aliases: [" + aliases + "]");
         }
         // old us time-zone names
         addOldMapping();

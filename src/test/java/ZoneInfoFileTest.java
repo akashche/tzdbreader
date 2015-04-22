@@ -34,11 +34,12 @@
  * to do so, delete this exception statement from your version.
  */
 
+import com.redhat.openjdk.java.util.TimeZone;
+import com.redhat.openjdk.sun.util.calendar.ZoneInfoFile;
 import org.junit.Test;
 
 import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
 
 /**
  * tzdb.dat load test
@@ -50,13 +51,12 @@ public class ZoneInfoFileTest {
         File projectDir = codeSourceDir(ZoneInfoFileTest.class).getParentFile().getParentFile();
 //        System.out.println(new File(projectDir, "src/test/resources").getAbsolutePath());
         System.setProperty("com.redhat.openjdk.java.home", new File(projectDir, "src/test/resources").getAbsolutePath());
-        // load class
-        Class.forName("com.redhat.openjdk.sun.util.calendar.ZoneInfoFile");
-//        System.out.println(ZoneInfoFile.getVersion());
-//        System.out.println("----------------");
-//        System.out.println(Arrays.toString(ZoneInfoFile.getZoneIds()));
-//        System.out.println("----------------");
-//        System.out.println(ZoneInfoFile.getAliasMap());
+        ZoneInfoFile.fireLoad();
+        System.out.println(ZoneInfoFile.getVersion());
+        System.out.println(TimeZone.getTimeZone("Europe/Dublin"));
+        System.out.println(TimeZone.getTimeZone("America/Toronto"));
+        System.out.println(TimeZone.getTimeZone("Asia/Tehran"));
+//        System.out.println(Arrays.toString(TimeZone.getAvailableIDs()));
     }
 
     private static File codeSourceDir(Class<?> clazz) {
