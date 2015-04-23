@@ -40,6 +40,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Arrays;
 
 /**
  * tzdb.dat load test
